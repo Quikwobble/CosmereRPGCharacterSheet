@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10 - 2026-08-17
+
+- Added removable custom skill rows.
+- Added clickable custom skill totals that roll two d20 results like standard skills.
+
 ## 0.1.9 - 2026-08-17
 
 - Simplified Talent Library badges to show only each talent’s path.

@@ -239,6 +239,8 @@
     .custom-skill-cell { display: flex; align-items: center; gap: 5px; }
     .custom-skill-cell .skill-name { flex: 1; min-width: 0; }
     .custom-skill-cell select { width: 62px; min-width: 62px; padding: 6px 3px; }
+    .remove-custom-skill { flex: 0 0 auto; border: 0; padding: 2px 4px; background: transparent; color: var(--cp-text-muted); font-weight: 800; cursor: pointer; }
+    .remove-custom-skill:hover { color: var(--cp-danger); }
     .skill-attribute { color: var(--cp-text-muted); font-size: 12px; }
     .skill-attribute select, .skill-name { width: 100%; border: 1px solid var(--cp-border); border-radius: 8px; padding: 6px; background: var(--cp-bg-elevated); color: var(--cp-text); }
     .skill-checks { display: flex; gap: 8px; }
@@ -459,7 +461,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.9 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.10 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -813,7 +815,7 @@
     let activeEquipmentIndex = null;
     let activeRoll = null;
     const pathOptions = ["Agent","Envoy","Hunter","Leader","Scholar","Warrior","Dustbringer","Edgedancer","Elsecaller","Lightweaver","Skybreaker","Stoneward","Truthwatcher","Willshaper","Windrunner","Bondsmith"];
-    const conditionOptions = ["Afflicted","Bleeding","Blinded","Burning","Dazed","Deafened","Disoriented","Exhausted","Frightened","Immobilized","Prone","Restrained","Stunned","Surprised","Unconscious","Injured","Broken Arm","Concussion","Deep Wound"];
+    const conditionOptions = ["Afflicted","Bleeding","Blinded","Burning","Dazed","Deafened","Determined","Disoriented","Empowered","Exhausted","Focused","Frightened","Immobilized","Prone","Restrained","Stunned","Surprised","Unconscious","Injured"];
     const conditionDescriptions = {
       Afflicted:"You suffer ongoing vital damage or another specified effect until the condition ends.",
       Bleeding:"You continue to lose health from an untreated wound.",
@@ -821,8 +823,11 @@
       Burning:"You take ongoing fire damage until the flames are extinguished.",
       Dazed:"Your actions and reactions are impaired by disorientation or a mental blow.",
       Deafened:"You cannot hear; sound-based senses and communication are impaired.",
+      Determined:"You are driven to complete a goal. The condition ends when you benefit from it or the scene ends.",
       Disoriented:"You have a disadvantage on tests against the source of the effect.",
+      Empowered:"You are empowered by Investiture, gaining the benefits specified by the effect that granted this condition.",
       Exhausted:"Your physical capability is reduced by the condition's penalty.",
+      Focused:"You are concentrated and ready, gaining the benefit specified by the effect that made you Focused.",
       Frightened:"Fear limits your ability to approach or act against its source.",
       Immobilized:"Your movement is reduced to 0 and you cannot move without first ending the condition.",
       Prone:"You are knocked down; standing up requires movement and attacks against you may gain an advantage.",
@@ -892,8 +897,9 @@
         const selectedChecks = skill.checks || Array.from({length:5}, (_,i)=>i<rank);
         const checks = Array.from({length:5}, (_,i)=>`<input type="checkbox" ${selectedChecks[i]?"checked":""} data-skill-rank="${custom?"custom":"basic"}" data-skill-name="${name}" data-skill-index="${index}" data-rank="${i+1}" aria-label="${name || "Custom skill"} expertise ${i+1}">`).join("");
         const total=Number(state.stats[skill.attribute]||0)+bonusFor("attribute",skill.attribute)+rank+bonusFor("skill",name);
-        const nameCell = custom ? `<span class="custom-skill-cell"><input class="skill-name" value="${name}" placeholder="Custom skill" data-custom-name="${index}"><select data-custom-attribute="${index}" title="Linked attribute">${allowedAttributes.map(attribute=>`<option value="${attribute}" ${skill.attribute===attribute?"selected":""}>${abbreviations[attribute]}</option>`).join("")}</select></span>` : `<button type="button" class="skill-name-button" data-roll-skill="${name}" data-skill-total="${total}">${name} <span class="skill-abbr">(${abbreviations[skill.attribute]||skill.attribute})</span></button>`;
-        return `<div class="skill-row"><strong class="skill-total">${total}</strong>${nameCell}<span class="skill-checks">${checks}</span></div>`;
+        const nameCell = custom ? `<span class="custom-skill-cell"><input class="skill-name" value="${name}" placeholder="Custom skill" data-custom-name="${index}"><select data-custom-attribute="${index}" title="Linked attribute">${allowedAttributes.map(attribute=>`<option value="${attribute}" ${skill.attribute===attribute?"selected":""}>${abbreviations[attribute]}</option>`).join("")}</select><button type="button" class="remove-custom-skill" data-remove-custom-skill="${index}" aria-label="Remove custom skill">×</button></span>` : `<button type="button" class="skill-name-button" data-roll-skill="${name}" data-skill-total="${total}">${name} <span class="skill-abbr">(${abbreviations[skill.attribute]||skill.attribute})</span></button>`;
+        const totalCell=custom?`<button type="button" class="skill-total skill-name-button" data-roll-skill="${name||"Custom skill"}" data-skill-total="${total}">${total}</button>`:`<strong class="skill-total">${total}</strong>`;
+        return `<div class="skill-row">${totalCell}${nameCell}<span class="skill-checks">${checks}</span></div>`;
       };
       const renderGroup=(id,groupName,groupAttributes)=>{
         const entries=Object.entries(state.skills).filter(([,skill])=>groupAttributes.includes(skill.attribute)).sort(([a],[b])=>a.localeCompare(b));
@@ -912,6 +918,9 @@
       }));
       document.querySelectorAll("[data-custom-name]").forEach(el=>el.addEventListener("input",()=>{state.customSkills[Number(el.dataset.customName)].name=el.value; persist();}));
       document.querySelectorAll("[data-custom-attribute]").forEach(el=>el.addEventListener("change",()=>{state.customSkills[Number(el.dataset.customAttribute)].attribute=el.value; renderSkills(); persist();}));
+      document.querySelectorAll("[data-remove-custom-skill]").forEach(button=>button.addEventListener("click",()=>{
+        state.customSkills.splice(Number(button.dataset.removeCustomSkill),1); renderSkills(); persist();
+      }));
       document.querySelectorAll("[data-roll-skill]").forEach(button=>button.addEventListener("click",()=>{
         activeRoll={type:"skill",name:button.dataset.rollSkill,modifier:Number(button.dataset.skillTotal)};
         const firstDie=Math.floor(Math.random()*20)+1, secondDie=Math.floor(Math.random()*20)+1, modifier=activeRoll.modifier;
