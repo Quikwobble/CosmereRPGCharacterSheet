@@ -277,6 +277,7 @@
     .toast.show { display: block; }
     .footer-note { color: var(--cp-text-muted); font-size: 12px; margin-top: 18px; }
     .app-footer { width: min(1280px, 94vw); margin: -34px auto 28px; color: var(--cp-text-muted); font-size: 11px; text-align: right; letter-spacing: .04em; }
+    .app-footer a { color: var(--cp-link); }
     @media (max-width: 980px) { .sheet-grid, .section-five, .overview-grid, .two-col { grid-template-columns: 1fr; } .sheet-span-2, .sheet-span-3, #passivePanel, #inventoryPanel, #goalsPanel { grid-column: auto; } .talent-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 650px) { .topbar, .hero { align-items: flex-start; flex-direction: column; } .sheet-grid { grid-template-columns: 1fr; } .sheet-id { text-align: left; } .three-col, .save-grid, .talent-grid { grid-template-columns: 1fr; } .stat-defense-row { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: repeat(2, 1fr); } .skill-header, .skill-row { grid-template-columns: 46px 1fr 86px; gap: 6px; } }
   </style>
@@ -450,7 +451,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1</footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.1 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -558,12 +559,120 @@
       ["Transformation","Peering Into Shadesmar"],["Transformation","Bloodcasting"],["Transformation","Living Soulcasting"],["Transformation","Soulcast Defense"],
       ["Transportation","Elsegate"],["Transportation","Realmwalker"],["Transportation","Realmic Step"],["Transportation","Shared Transportation"]
     ];
+    const fallbackTalentDetail=(path,name)=>{
+      const details={
+        "Stonestance":"Enter Stonestance: increase your Physical and Cognitive defenses by 1. After you are hit or grazed in melee, test Athletics against the attacker's Cognitive defense to push them.",
+        "Windstance":"Enter Windstance to use movement and positioning to improve your reach and mobility during combat.",
+        "Bloodstance":"Enter Bloodstance to turn successful melee attacks into additional pressure against your opponent.",
+        "Practiced Kata":"You can use stances in conversations and endeavors, and unless Surprised, can start each scene in Vigilant Stance.",
+        "Deepened Bond":"Your spren bond range increases to 100 feet, and giving your spren a task costs 1 fewer focus.",
+        "Invested":"Your maximum Investiture increases by an amount equal to your tier.",
+        "Take Squire":"After a long rest, choose a willing companion to become your squire and grant them one or both of your Surges.",
+        "Wound Regeneration":"Spend Investiture to recover from a temporary or permanent injury when you use Regenerate.",
+        "Searing Dust Storm":"Spend Investiture while moving to create an obscuring dust cloud that increases damage dealt to enemies inside it.",
+        "Edgedancer's Grace":"While you have Investiture, gain an additional Avoid Danger or Dodge option without spending focus.",
+        "Elsecaller's Perspicacity":"While you have Investiture, gain an advantage on Deduction tests, reactions, and tests to peer between realms.",
+        "Persistent":"Your Illumination effects persist longer and remain useful after the initial illusion is created.",
+        "Persistent Transformation":"Your Transformation effects resist ending and can be maintained for longer.",
+        "Physical Illusion":"Create an illusion with enough substance to interact physically with the world.",
+        "Cohesive Teamwork":"Coordinate with allies to improve teamwork and make your group harder to separate or overwhelm.",
+        "Sinkhole":"Use Cohesion to collapse or reshape a section of stone beneath a target or area.",
+        "Spiritual Healing":"Use Progression to restore a character's spiritual resilience and recover from harm.",
+        "Alter Fortune":"Use Future Sight to alter the outcome of a nearby event after glimpsing a possible future.",
+        "Glimpse the Future":"Gain a vision of a possible future that can guide your next choice.",
+        "Vision Void":"Create a gap in prophetic sight, making a target or event harder to perceive through future visions.",
+        "Search the Past":"Use your visions to uncover information about a place, object, or event from the past.",
+        "Spiritual Cohesion":"Use Cohesion to strengthen bonds between people, objects, or parts of a structure.",
+        "Reverse Lashing":"Invest a weapon or projectile so it attracts nearby matter and targets.",
+        "Frictionless Motion":"While infused with Abrasion, increase movement by 10 and ignore Slowed.",
+        "Graceful Skating":"When you Skate, move freely without being restricted to a straight line.",
+        "Reverse Abrasion":"Increase friction in an object or area to cancel difficult terrain and gain an advantage when interacting with it.",
+        "Slippery Target":"While infused with Abrasion, attacks against you cannot graze and Reactive Strikes against you have a disadvantage.",
+        "Smooth Operator":"While you have Investiture, remain infused with Abrasion and pay 1 fewer focus to Skate.",
+        "Extended Adhesion":"Your Adhesion infusions last longer before their Investiture is expended.",
+        "Adhesive Trap":"Create an Adhesion effect that binds a target or area in place.",
+        "Superior Bond":"Strengthen a Lashing or Adhesion effect so it is harder to break.",
+        "Binding Shot":"Use Adhesion to bind a distant target with a ranged attack.",
+        "Binding Strike":"Use Adhesion with a melee attack to bind or restrain your target.",
+        "Living Adhesion":"Use Adhesion on living targets and objects with greater control.",
+        "Shaping Stone":"Use Cohesion to reshape solid stone into a desired form.",
+        "Flowing Earth":"Move and reshape earth as though it were fluid.",
+        "Memories of Stone":"Read impressions held by stone to learn about what happened around it.",
+        "Tunneling":"Use Cohesion to create a passage through solid stone.",
+        "Stone Spear":"Shape stone into a spear and use it as a weapon.",
+        "Escaping Solid Stone":"Use Cohesion to escape or pass through a solid stone obstruction.",
+        "Through the Stone":"Move through stone while using Cohesion.",
+        "True Stoneshaping":"Gain precise control over large or complex stone shapes.",
+        "Bodily Decay":"Use Division to cause a target to suffer an injury after a successful attack.",
+        "Devastating Division":"Roll an additional damage die when dealing Division damage.",
+        "Eroding Escape":"Spend Investiture to end Restrained or Immobilized effects.",
+        "Gout of Flame":"Spend Investiture to make a Division attack against every target in a larger area.",
+        "Igniting Division":"Spend Investiture to ignite a target's space and deal ongoing damage.",
+        "Spark Sending":"Use Division through a solid surface at extended reach.",
+        "Unleashed Entropy":"Reduce the cost of using Division and lower the DC of Division Under Pressure.",
+        "Group Flight":"Use Gravitation to help multiple characters fly together.",
+        "Aerial Squadron":"Coordinate several flying allies as an aerial unit.",
+        "Tricky Maneuvers":"Use Gravitation to make difficult aerial maneuvers and evade attacks.",
+        "Flying Ace":"Gain superior control and accuracy while flying.",
+        "Gravitational Slam":"Use Gravitation to crash a target into a surface or the ground.",
+        "Lashing Shot":"Use Gravitation to alter the path or trajectory of a ranged attack.",
+        "Master of the Skies":"Gain broad control over aerial movement and positioning.",
+        "Multiple Lashings":"Apply multiple Lashings to a target or object at once.",
+        "Controlling Illusions":"Direct and reshape an active Illumination illusion.",
+        "Maintaining Illusions":"Maintain an Illumination effect with less attention or cost.",
+        "Detecting Illusions":"Use Illumination knowledge to recognize or investigate illusions.",
+        "Disorienting Flash":"Use Illumination to disorient targets with a sudden burst of light.",
+        "Distracting Illusion":"Create an illusion that draws attention away from an ally or objective.",
+        "Multiplicative Lightweaving":"Create multiple simultaneous Illumination effects.",
+        "Spiritual Illumination":"Use Illumination to affect spiritual perception and influence.",
+        "Endless Illusions":"Maintain multiple illusions for an extended duration.",
+        "Lingering Lightweaving":"Leave an Illumination effect in place after you stop actively controlling it.",
+        "Growth":"Use Progression to grow or restore living matter.",
+        "Explosive Growth":"Spend Investiture to cause plants to grow explosively in an area.",
+        "Extended Regrowth":"Your Regrowth infusions last for more rounds per Investiture spent.",
+        "From the Brink":"Spend Investiture to restore life to a willing character who died within the last minute.",
+        "Injury Regrowth":"Use Progression to recover a target from an injury.",
+        "Overgrowth":"Use Progression to make a plant grow far beyond its normal limits.",
+        "Reliable Progression":"When you roll a Progression die, set the result equal to your Progression ranks.",
+        "Swift Regeneration":"When you Regenerate, recover health equal to 1d6 plus your Progression modifier.",
+        "Extended Tension":"Your Tension effects last longer before their Investiture is expended.",
+        "Surface Tension":"Manipulate the tension of a surface to alter how it supports weight or movement.",
+        "Fine Control":"Use Tension with greater precision and control over individual objects.",
+        "Clothsmith":"Shape and manipulate cloth with Tension.",
+        "Cloth Mastery":"Gain advanced control over cloth and flexible materials.",
+        "Rigged Weaponry":"Use Tension to create or modify a weapon with a concealed advantage.",
+        "Tension Parry":"Use Tension defensively to alter or catch an incoming attack.",
+        "Peering Into Shadesmar":"Use Transformation to look into the Cognitive Realm for information.",
+        "Bloodcasting":"Use Transformation to cleanse poison and reduce the recovery time of an injury.",
+        "Living Soulcasting":"Use Transformation against a living target to cause devastating spiritual damage.",
+        "Soulcast Defense":"Use Transformation to defend against projectile or melee attacks.",
+        "Elsegate":"Create or use a gateway between realms.",
+        "Cognitive Farsight":"See into the Cognitive Realm at an extended distance.",
+        "Cognitive Vision":"Read intent and environmental information while peering into the Cognitive Realm.",
+        "Realmic Evasion":"Use Transportation to turn a hit into a miss by shifting between realms.",
+        "Shared Transportation":"Spend Investiture to bring additional characters with you when you transport.",
+        "Soaring Destruction":"Use Gravitation and your Skybreaker training to attack from the air.",
+        "Sharp Eye":"Observe a target and learn a useful weakness or resource condition.",
+        "Backstep":"After a ranged attack, Disengage and gain the benefit of Brace from cover.",
+        "Exploit Weakness":"Use Gain Advantage against your quarry without spending focus.",
+        "Unrelenting Salvo":"Strike your quarry more than once per turn with the same ranged weapon.",
+        "Cold Eyes":"After defeating your quarry, recover focus and designate a new quarry.",
+        "Fatal Thrust":"Make a devastating attack against an unsuspecting target with a light weapon.",
+        "Shadowing":"Gain an advantage to avoid being sensed by your quarry and a disadvantage to your quarry's attempts to sense you.",
+        "Sidestep":"Gain an additional Dodge option when you are not wearing heavy armor.",
+        "Swift Strikes":"Spend focus to make a second Strike with a hand already used this turn.",
+        "Startling Blow":"Make an unarmed or improvised attack that leaves the target Surprised.",
+        "Mighty":"Increase weapon or unarmed damage based on the actions spent on the attack.",
+        "Fast Talker":"Spend focus to gain an advantage for spiritual tests using skills or Agent talents."
+      };
+      return details[name]||`A ${path} talent that provides a specialized option for your character.`;
+    };
     handbookTalents.forEach(([path,name]) => {
       if (!talents.some(t => t.name === name && t.path === path)) {
         talents.push({
           name, path, tag:"Handbook talent",
-          summary:"Handbook talent — select Details to review its prerequisite and activation.",
-          detail:`This talent appears in the Stormlight Handbook talent listings for ${path}. Review its prerequisite and activation text in the handbook before play. The character sheet tracks it here so you can select it, search for it, and keep it with the rest of your build.`
+          summary:fallbackTalentDetail(path,name),
+          detail:fallbackTalentDetail(path,name)
         });
       }
     });
@@ -576,8 +685,8 @@
     omittedTalentEntries.forEach(([path,name])=>{
       if(!talents.some(t=>t.name===name && t.path===path)) talents.push({
         name,path,tag:"Handbook talent",
-        summary:`${name} from the ${path} talent tree.`,
-        detail:`This talent is listed in the Stormlight Handbook under the ${path} talent tree. Load the handbook file with the Load handbook button to populate its full prerequisite and activation text.`
+        summary:fallbackTalentDetail(path,name),
+        detail:fallbackTalentDetail(path,name)
       });
     });
     const radiantIdealTalents = [
