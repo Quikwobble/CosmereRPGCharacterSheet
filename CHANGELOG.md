@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5 - 2026-08-17
+
+- Removed the Collapse all and Expand all controls and handlers to free space in the top menu.
+
 ## 0.1.4 - 2026-08-17
 
 - Added a New character button that resets the active sheet without deleting saved characters.

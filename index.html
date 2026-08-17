@@ -304,8 +304,6 @@
           <option value="gold">Gold</option>
           <option value="violet">Violet</option>
         </select>
-        <button class="button ghost" id="collapseAllBtn">Collapse all</button>
-        <button class="button ghost" id="expandAllBtn">Expand all</button>
         <button class="button" id="importBtn">Import JSON</button>
         <button class="button" id="exportBtn">Export JSON</button>
         <button class="button" id="newCharacterBtn">New character</button>
@@ -458,7 +456,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.4 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.5 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -1151,15 +1149,6 @@
     document.documentElement.dataset.accent=savedAccent;
     $("accentSelect").value=savedAccent;
     $("accentSelect").addEventListener("change",()=>{document.documentElement.dataset.accent=$("accentSelect").value;localStorage.setItem("cosmere-accent",$("accentSelect").value);});
-    const setAllSections=(collapsed)=>{
-      document.querySelectorAll(".panel, .subsection, .conditions-block").forEach(container=>{
-        container.classList.toggle("collapsed",collapsed);
-        const header=container.querySelector(":scope > .section-title");
-        if(header) header.setAttribute("aria-expanded",String(!collapsed));
-      });
-    };
-    $("collapseAllBtn").addEventListener("click",()=>setAllSections(true));
-    $("expandAllBtn").addEventListener("click",()=>setAllSections(false));
     $("importBtn").addEventListener("click",()=> $("importInput").click());
     $("importInput").addEventListener("change",async()=>{
       const file=$("importInput").files[0];
