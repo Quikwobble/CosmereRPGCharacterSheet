@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 - 2026-08-17
+
+- Added Opportunity indicators for d6 results of 5–6.
+- Added Complication indicators for d6 results of 1–2.
+
 ## 0.1.2 - 2026-08-17
 
 - Finalized the Paths multi-select dropdown with aligned checkboxes, compact spacing, and no horizontal overflow.
