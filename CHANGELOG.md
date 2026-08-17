@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 - 2026-08-17
+
+- Added an automatically calculated Current tier field to the character profile.
+
 ## 0.1.5 - 2026-08-17
 
 - Removed the Collapse all and Expand all controls and handlers to free space in the top menu.

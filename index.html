@@ -345,6 +345,7 @@
               <div class="field"><label>Character name</label><input data-bind="name" placeholder="Kaladin Stormblessed" /></div>
               <div class="field"><label>Paths</label><div class="multi-select" id="pathPicker"><button type="button" class="multi-select-button" id="pathPickerButton"><span id="pathPickerLabel">Select paths</span></button><div class="multi-select-menu" id="pathPickerMenu"></div></div><div class="selected-paths" id="selectedPaths"></div></div>
               <div class="field"><label>Level</label><input type="number" min="1" max="20" data-bind="level" /></div>
+              <div class="field"><label>Current tier</label><input id="currentTier" readonly aria-readonly="true" /></div>
               <div class="field"><label>Ancestry</label><input data-bind="ancestry" placeholder="Human, singer..." /></div>
               <div class="field"><label>Culture</label><input data-bind="culture" placeholder="Alethi" /></div>
             </div>
@@ -456,7 +457,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.5 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.6 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -833,6 +834,7 @@
 
     const $ = (id) => document.getElementById(id);
     const clone = (value) => JSON.parse(JSON.stringify(value));
+    const tierForLevel = level => level >= 21 ? 5 : Math.max(1, Math.ceil(level / 5));
     const bonusFor = (type,target) => state.bonuses.filter(bonus=>bonus.type===type && bonus.target===target).reduce((sum,bonus)=>sum+Number(bonus.value||0),0);
     const showToast = (message) => { const t=$("toast"); t.textContent=message; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2200); };
     const persist = () => { localStorage.setItem("cosmere-current", JSON.stringify(state)); $("saveStatus").textContent = "Auto-saved"; $("saveStatus").style.color = "var(--cp-success)"; };
@@ -1060,6 +1062,7 @@
     }
     function render() {
       $("heroName").textContent=state.name||"Untitled Radiant";
+      $("currentTier").value=`Tier ${tierForLevel(Number(state.level)||1)}`;
       renderPathPicker();
       document.querySelectorAll("[data-bind]").forEach(el=>{
         if (document.activeElement===el || state[el.dataset.bind]===undefined) return;
