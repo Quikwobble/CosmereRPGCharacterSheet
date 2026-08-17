@@ -277,6 +277,8 @@
     .roll-result { margin-top: 24px; color: var(--cp-accent); font-size: 34px; font-weight: 800; text-align: center; }
     .critical-fail { color: var(--cp-danger); font-size: 14px; }
     .critical-success { color: var(--cp-success); font-size: 14px; }
+    .opportunity { color: var(--cp-success); font-size: 14px; }
+    .complication { color: var(--cp-warning); font-size: 14px; }
     .toast { position: fixed; right: 22px; bottom: 22px; display: none; padding: 12px 15px; border-radius: 10px; background: var(--cp-text); color: var(--cp-bg); box-shadow: var(--cp-shadow); z-index: 30; }
     .toast.show { display: block; }
     .footer-note { color: var(--cp-text-muted); font-size: 12px; margin-top: 18px; }
@@ -455,7 +457,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.2 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.3 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -873,6 +875,10 @@
       document.querySelectorAll("[data-stat]").forEach((el) => el.addEventListener("input", () => { state.stats[el.dataset.stat]=Number(el.value); render(); persist(); }));
     }
     const rollResultMarkup=(die,total,ordinal)=>`<div>${ordinal?`${ordinal} result`:"Result"}: ${total}${die===1?` <span class="critical-fail">Critical fail</span>`:die===20?` <span class="critical-success">Critical success</span>`:""}</div>`;
+    const standaloneDieMarkup=(sides,die)=>{
+      const note=sides===6&&die>=5?` <span class="opportunity">Opportunity!</span>`:sides===6&&die<=2?` <span class="complication">Complication!</span>`:sides===20&&die===1?` <span class="critical-fail">Critical fail</span>`:sides===20&&die===20?` <span class="critical-success">Critical success</span>`:"";
+      return `<div>Result: ${die}${note}</div>`;
+    };
     function renderSkills() {
       const attributes = Object.keys(state.stats);
       const abbreviations = {Strength:"STR",Speed:"SPD",Intellect:"INT",Willpower:"WIL",Awareness:"AWA",Presence:"PRE"};
@@ -1101,7 +1107,7 @@
       activeRoll={type:"die",sides};
       const result=Math.floor(Math.random()*sides)+1;
       $("rollSkillName").textContent=`d${sides} roll`;
-      $("rollResult").innerHTML=sides===20?rollResultMarkup(result,result,""):`<div>${result}</div>`;
+      $("rollResult").innerHTML=standaloneDieMarkup(sides,result);
       $("rollBackdrop").classList.add("open");
     }));
     $("rerollButton").addEventListener("click",()=>{
@@ -1111,7 +1117,7 @@
         $("rollResult").innerHTML=rollResultMarkup(firstDie,firstDie+activeRoll.modifier,"1st")+rollResultMarkup(secondDie,secondDie+activeRoll.modifier,"2nd");
       } else {
         const die=Math.floor(Math.random()*activeRoll.sides)+1;
-        $("rollResult").innerHTML=activeRoll.sides===20?rollResultMarkup(die,die,""):`<div>${die}</div>`;
+        $("rollResult").innerHTML=standaloneDieMarkup(activeRoll.sides,die);
       }
     });
     $("saveEquipmentChanges").addEventListener("click",()=>{
