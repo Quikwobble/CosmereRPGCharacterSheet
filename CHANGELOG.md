@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 - 2026-08-17
+
+- Added a New character button that resets the active sheet without deleting saved characters.
+
 ## 0.1.3 - 2026-08-17
 
 - Added Opportunity indicators for d6 results of 5–6.
