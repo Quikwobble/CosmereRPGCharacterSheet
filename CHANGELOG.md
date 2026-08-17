@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.9 - 2026-08-17
+
+- Simplified Talent Library badges to show only each talent’s path.
+
+## 0.1.8 - 2026-08-17
+
+- Improved custom skill row formatting so skill names remain visible beside compact attribute selectors.
+
+## 0.1.7 - 2026-08-17
+
+- Unified the talent catalog into one deduplicated, alphabetically sorted runtime array.
+
 ## 0.1.6 - 2026-08-17
 
 - Added an automatically calculated Current tier field to the character profile.

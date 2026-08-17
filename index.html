@@ -237,6 +237,8 @@
     .skill-name-button:hover { color: var(--cp-accent); }
     .skill-abbr { color: var(--cp-text-muted); font-size: 11px; font-weight: 700; }
     .custom-skill-cell { display: flex; align-items: center; gap: 5px; }
+    .custom-skill-cell .skill-name { flex: 1; min-width: 0; }
+    .custom-skill-cell select { width: 62px; min-width: 62px; padding: 6px 3px; }
     .skill-attribute { color: var(--cp-text-muted); font-size: 12px; }
     .skill-attribute select, .skill-name { width: 100%; border: 1px solid var(--cp-border); border-radius: 8px; padding: 6px; background: var(--cp-bg-elevated); color: var(--cp-text); }
     .skill-checks { display: flex; gap: 8px; }
@@ -457,7 +459,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.6 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.9 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -510,7 +512,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const talents = [
+    let talents = [
       {name:"Opportunist", path:"Agent", tag:"Key talent", summary:"You instinctively sense moments of consequence.", detail:"Prerequisite: none\\n\\nOnce per round, when you roll a plot die, you can reroll that result. The original roll has no effect and you must use the new result."},
       {name:"Watchful Eye", path:"Agent", tag:"Investigator", summary:"Extend your plot-die intuition to a willing ally.", detail:"Prerequisite: Deduction 1+\\n\\nUse Opportunist on the plot die of a willing ally within 20 feet."},
       {name:"Cheap Shot", path:"Agent", tag:"Spy / thief", summary:"Turn a moment of surprise into a decisive unarmed strike.", detail:"Prerequisite: Insight 2+\\n\\nSpend 1 focus to make an unarmed attack with Thievery vs. Cognitive, raising the stakes. On a hit, the target is Stunned."},
@@ -789,6 +791,8 @@
         t.detail = handbookSnippets[t.name];
       }
     });
+    talents = Array.from(new Map(talents.map(talent=>[`${talent.path}::${talent.name}`,talent])).values())
+      .sort((a,b)=>a.name.localeCompare(b.name)||a.path.localeCompare(b.path));
     const defaultState = {
       name:"", path:["Agent"], level:1, ancestry:"", culture:"", pronouns:"",
       stats:{Strength:2,Speed:2,Intellect:2,Awareness:2,Willpower:2,Presence:2},
@@ -888,7 +892,7 @@
         const selectedChecks = skill.checks || Array.from({length:5}, (_,i)=>i<rank);
         const checks = Array.from({length:5}, (_,i)=>`<input type="checkbox" ${selectedChecks[i]?"checked":""} data-skill-rank="${custom?"custom":"basic"}" data-skill-name="${name}" data-skill-index="${index}" data-rank="${i+1}" aria-label="${name || "Custom skill"} expertise ${i+1}">`).join("");
         const total=Number(state.stats[skill.attribute]||0)+bonusFor("attribute",skill.attribute)+rank+bonusFor("skill",name);
-        const nameCell = custom ? `<span class="custom-skill-cell"><input class="skill-name" value="${name}" placeholder="Custom skill" data-custom-name="${index}"><select data-custom-attribute="${index}">${allowedAttributes.map(attribute=>`<option ${skill.attribute===attribute?"selected":""}>${abbreviations[attribute]} — ${attribute}</option>`).join("")}</select></span>` : `<button type="button" class="skill-name-button" data-roll-skill="${name}" data-skill-total="${total}">${name} <span class="skill-abbr">(${abbreviations[skill.attribute]||skill.attribute})</span></button>`;
+        const nameCell = custom ? `<span class="custom-skill-cell"><input class="skill-name" value="${name}" placeholder="Custom skill" data-custom-name="${index}"><select data-custom-attribute="${index}" title="Linked attribute">${allowedAttributes.map(attribute=>`<option value="${attribute}" ${skill.attribute===attribute?"selected":""}>${abbreviations[attribute]}</option>`).join("")}</select></span>` : `<button type="button" class="skill-name-button" data-roll-skill="${name}" data-skill-total="${total}">${name} <span class="skill-abbr">(${abbreviations[skill.attribute]||skill.attribute})</span></button>`;
         return `<div class="skill-row"><strong class="skill-total">${total}</strong>${nameCell}<span class="skill-checks">${checks}</span></div>`;
       };
       const renderGroup=(id,groupName,groupAttributes)=>{
@@ -1051,7 +1055,7 @@
       const search=($("talentSearch").value||"").toLowerCase(), filter=$("talentFilter").value;
       const visible=talents.filter(t=>(filter==="All"||t.path===filter) && `${t.name} ${t.path} ${t.tag} ${t.summary} ${t.detail}`.toLowerCase().includes(search));
       $("talentCount").textContent=`${visible.length} of ${talents.length} shown`;
-      $("talentGrid").innerHTML=visible.map(t=>`<article class="talent-card"><span class="badge">${t.path} · ${t.tag}</span><h4>${t.name}</h4><p>${t.summary}</p><footer><span style="color:var(--cp-text-muted);font-size:11px">${state.selectedTalents.includes(t.name)?"Selected":"Available"}</span><button class="button" data-open-talent="${t.name}">Details</button></footer></article>`).join("") || `<div class="empty" style="grid-column:1/-1">No talents match that search.</div>`;
+      $("talentGrid").innerHTML=visible.map(t=>`<article class="talent-card"><span class="badge">${t.path}</span><h4>${t.name}</h4><p>${t.summary}</p><footer><span style="color:var(--cp-text-muted);font-size:11px">${state.selectedTalents.includes(t.name)?"Selected":"Available"}</span><button class="button" data-open-talent="${t.name}">Details</button></footer></article>`).join("") || `<div class="empty" style="grid-column:1/-1">No talents match that search.</div>`;
       document.querySelectorAll("[data-open-talent]").forEach(el=>el.addEventListener("click",()=>openTalent(el.dataset.openTalent)));
     }
     function renderSaves() {
