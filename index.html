@@ -75,6 +75,7 @@
       background: var(--cp-bg);
       color: var(--cp-text);
       font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
     }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
@@ -83,7 +84,7 @@
       position: sticky; top: 0; z-index: 10;
       display: flex; align-items: center; justify-content: space-between; gap: 20px;
       padding: 12px 5vw; background: var(--cp-accent);
-      border-bottom: 3px solid var(--cp-text); color: var(--cp-accent-fg);
+      border-bottom: 3px solid var(--cp-text); color: var(--cp-accent-fg); flex-wrap: wrap;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark {
@@ -165,14 +166,17 @@
     }
     .field select[multiple] { min-height: 78px; }
     .multi-select { position: relative; }
-    .multi-select-button { width: 100%; min-height: 39px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cp-border-strong); border-radius: 2px; padding: 9px 10px; background: transparent; color: var(--cp-text); text-align: left; }
+    .multi-select-button { width: 100%; min-height: 39px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--cp-border-strong); border-radius: 2px; padding: 9px 10px; background: var(--cp-surface); color: var(--cp-text); text-align: left; line-height: 1.2; }
+    .multi-select-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .multi-select-button::after { content: "▾"; color: var(--cp-accent); }
-    .multi-select-menu { position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 8; display: none; padding: 6px; border: 1px solid var(--cp-border-strong); border-radius: 3px; background: var(--cp-surface); box-shadow: var(--cp-shadow); }
-    .multi-select-menu.open { display: grid; }
-    .path-option { display: flex; gap: 8px; align-items: center; padding: 7px 8px; color: var(--cp-text); font-size: 12px; }
+    .multi-select-menu { position: absolute; left: 0; top: calc(100% + 4px); z-index: 8; display: none; width: 260px; max-width: min(320px, calc(100vw - 32px)); max-height: 300px; overflow-y: auto; padding: 4px; border: 1px solid var(--cp-border-strong); border-radius: 3px; background: var(--cp-surface); box-shadow: var(--cp-shadow); }
+    .multi-select-menu.open { display: flex; flex-direction: column; align-items: flex-start; }
+    .path-option { display: grid; grid-template-columns: 16px max-content; gap: 2px; align-items: center; align-self: stretch; width: auto; min-height: 30px; padding: 4px 2px; border-radius: 2px; color: var(--cp-text); font-size: 12px; white-space: nowrap; }
+    .path-option input { width: 13px; height: 13px; margin: 0; justify-self: start; }
+    .path-option:hover { background: var(--cp-accent-soft); }
     .path-option:hover { background: var(--cp-accent-soft); }
     .path-option input { accent-color: var(--cp-accent); }
-    .selected-paths { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+    .selected-paths { display: flex; gap: 5px; flex-wrap: wrap; min-height: 20px; margin-top: 7px; }
     .selected-paths span { padding: 3px 7px; border: 1px solid var(--cp-accent); border-radius: 999px; color: var(--cp-accent); font-size: 10px; font-weight: 800; }
     .field textarea { min-height: 105px; resize: vertical; }
     .field input:focus, .field select:focus, .field textarea:focus, .search:focus { border-color: var(--cp-accent); box-shadow: 0 0 0 3px var(--cp-accent-soft); }
@@ -225,11 +229,11 @@
     .defense { text-align: center; border: 1px solid var(--cp-border-strong); border-radius: 3px; padding: 10px 6px; }
     .defense strong { display: block; font-size: 24px; color: var(--cp-accent); }
     .defense span { color: var(--cp-text-muted); font-size: 11px; font-weight: 750; text-transform: uppercase; }
-    .skill-header, .skill-row { display: grid; grid-template-columns: 54px minmax(150px, 1.35fr) minmax(130px, .9fr); align-items: center; gap: 10px; }
+    .skill-header, .skill-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 6px; }
     .skill-header { padding: 0 10px 7px; color: var(--cp-text-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
     .skill-row { padding: 8px 10px; border-top: 1px solid var(--cp-border); min-height: 43px; }
     .skill-row strong { font-size: 13px; }
-    .skill-name-button { border: 0; padding: 0; background: transparent; color: var(--cp-text); font: inherit; font-weight: 400; text-align: left; cursor: pointer; }
+    .skill-name-button { border: 0; min-width: 0; overflow: hidden; padding: 0; background: transparent; color: var(--cp-text); font: inherit; font-weight: 400; text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
     .skill-name-button:hover { color: var(--cp-accent); }
     .skill-abbr { color: var(--cp-text-muted); font-size: 11px; font-weight: 700; }
     .custom-skill-cell { display: flex; align-items: center; gap: 5px; }
@@ -338,7 +342,7 @@
             <div class="section-title"><h3>Identity</h3><span>Character profile</span></div>
             <div class="grid three-col">
               <div class="field"><label>Character name</label><input data-bind="name" placeholder="Kaladin Stormblessed" /></div>
-              <div class="field"><label>Paths</label><div class="multi-select" id="pathPicker"><button type="button" class="multi-select-button" id="pathPickerButton">Select paths</button><div class="multi-select-menu" id="pathPickerMenu"></div></div><div class="selected-paths" id="selectedPaths"></div></div>
+              <div class="field"><label>Paths</label><div class="multi-select" id="pathPicker"><button type="button" class="multi-select-button" id="pathPickerButton"><span id="pathPickerLabel">Select paths</span></button><div class="multi-select-menu" id="pathPickerMenu"></div></div><div class="selected-paths" id="selectedPaths"></div></div>
               <div class="field"><label>Level</label><input type="number" min="1" max="20" data-bind="level" /></div>
               <div class="field"><label>Ancestry</label><input data-bind="ancestry" placeholder="Human, singer..." /></div>
               <div class="field"><label>Culture</label><input data-bind="culture" placeholder="Alethi" /></div>
@@ -451,7 +455,7 @@
         </div>
       </section>
     </main>
-    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.1 · <a href="CHANGELOG.md">Changelog</a></footer>
+    <footer class="app-footer">Cosmere RPG Character Sheet · Version 0.1.2 · <a href="CHANGELOG.md">Changelog</a></footer>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop">
@@ -848,7 +852,7 @@
     }
     function renderPathPicker() {
       const selected = Array.isArray(state.path) ? state.path : (state.path ? [state.path] : []);
-      $("pathPickerButton").firstChild && ($("pathPickerButton").firstChild.textContent = selected.length ? selected.join(", ") : "Select paths");
+      $("pathPickerLabel").textContent = selected.length ? `${selected.length} selected` : "Select paths";
       $("pathPickerMenu").innerHTML = pathOptions.map(path=>`<label class="path-option"><input type="checkbox" value="${path}" ${selected.includes(path)?"checked":""}>${path}</label>`).join("");
       $("selectedPaths").innerHTML = selected.length ? selected.map(path=>`<span>${path}</span>`).join("") : `<span style="border-color:var(--cp-border);color:var(--cp-text-muted)">No paths selected</span>`;
       $("pathPickerMenu").querySelectorAll("input").forEach(input=>input.addEventListener("change",()=>{

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2026-08-17
+
+- Finalized the Paths multi-select dropdown with aligned checkboxes, compact spacing, and no horizontal overflow.
+
 ## 0.1.1 - 2026-08-17
 
 - Expanded the embedded talent catalog and removed generic handbook-placeholder descriptions.
